@@ -4,29 +4,34 @@ pacman::p_load(Packages, character.only = TRUE)
 #Lesa inn myndir, búa til möppu "minnimyndir" og setja þær inn í hana
 herepath <- here()
 pathnew <- paste(herepath,"minnimyndir",sep = "/")
-dir.create(pathnew)
-myndir <- list.files(herepath,pattern = "JPEG|JPG", recursive = T,full.names = T)
-
+#dir.create(pathnew)
 defines <- c("png:compression-filter" = "1", "png:compression-level" = "0")
 
-for (i in myndir) {
-mynd <- image_read(i) %>%
-  image_resize("800x800")
-print(paste(gsub(".*[/]([^.]+)[.].*", "\\1", i)))
-  image_set_defines(mynd, defines)
-  image_write(mynd, path = paste(pathnew,paste(gsub(".*[/]([^.]+)[.].*", "\\1", i),"JPEG",sep = "."),sep = "/"))
+myndir <- list.files(herepath,pattern = "JPEG|JPG", recursive = T,full.names = T)
+myndirB <- myndir[!gsub('.*/ ?(\\w+)', '\\1', myndir) %in% list.files(pathnew)] #ef þarf að bæta við eftir á 
+
+
+for (i in myndirB) {
+  mynd <- image_read(i) %>%
+    image_resize("800x800")
+  image_write(mynd,path = paste(pathnew, paste(gsub(".*[/]([^.]+)[.].*", "\\1", i), "JPEG", sep = "."), sep = "/"))
+  image_destroy(mynd)
+  print(paste(gsub(".*[/]([^.]+)[.].*", "\\1", i)))
+  gc(reset = T)
 }
+
 
 ### Git: commit og push
 
 ###Ná í slóðirnar að myndunum eftir að þær eru komnar í möppuna minnimyndir
-req <- GET("https://api.github.com/repos/harkanatta/eyjarey/git/trees/main?recursive=1")
+###muna heiti á repository
+req <- GET("https://api.github.com/repos/harkanatta/asbjarnarvotn21/git/trees/main?recursive=1")
 stop_for_status(req)
 
 filelist <- tibble(path=unlist(lapply(content(req)$tree, "[", "path"), use.names = F) %>% 
                      stringr::str_subset("minnimyndir") %>% 
                      stringr::str_subset("JPEG|JPG|PNG")) %>%
-  mutate(URL='https://raw.githubusercontent.com/harkanatta/eyjarey/main/',
+  mutate(URL='https://raw.githubusercontent.com/harkanatta/asbjarnarvotn21/main/',
          mURL=glue("{URL}{path}")) %>% 
   select(mURL)
 
