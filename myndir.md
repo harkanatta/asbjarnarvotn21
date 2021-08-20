@@ -1,7 +1,7 @@
 ---
 title: Myndir úr Ásbjarnarvötnum 2021
 tags: NNV, 2021, Skagafjörður, feltbók, miðhálendið, Hofsjökull, Orravatnsrústir
-description: Myndir frá Eyjarey 2021
+description: Myndir frá úr Ásbjarnarvötnum ofl 2021
 slideOptions:
   theme: league
   transition: 'fade'
